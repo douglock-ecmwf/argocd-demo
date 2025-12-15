@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: argodemo
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: ArgoCD Demo Project
+  sourceRepos:
+    - "*"
+  destinations:
+    - namespace: argodemo
+      server: https://kubernetes.default.svc
+  # Optional: restrict cluster-scoped resources
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  # Allow all namespaced resources (you can tighten this if needed)
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"
