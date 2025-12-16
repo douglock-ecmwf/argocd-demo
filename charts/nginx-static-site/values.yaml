@@ -1,0 +1,15 @@
+# Default values.yaml for nginx-static-site
+
+enable_external_dns: false
+
+# Mandatory site name (used in service name, ingress path, labels)
+siteName: ""
+siteContent: "Hello, World!"
+
+image:
+  repository: nginx
+  tag: "1.29.4"
+  pullPolicy: IfNotPresent
+
+tls:
+  secretName: demo-tls

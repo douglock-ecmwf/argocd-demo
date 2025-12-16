@@ -1,0 +1,35 @@
+{{- if .Values.siteName }}
+{{- $fullName := include "nginx-static-site.fullname" . -}}
+{{- $svcName := include "nginx-static-site.serviceName" . -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "nginx-static-site.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    {{- if .Values.enable_external_dns }}
+    external-dns.alpha.kubernetes.io/hostname: demo.ecmwf-pet-k8s.compute.cci1.ecmwf.int
+    external-dns.alpha.kubernetes.io/ttl: "300"
+    {{- end }}
+spec:
+  ingressClassName: nginx
+  {{ if .Values.tls.secretName -}}
+  tls:
+    - secretName: {{ .Values.tls.secretName }}
+      hosts:
+        - demo.ecmwf-pet-k8s.compute.cci1.ecmwf.int
+  {{- end }}
+  rules:
+    - host: demo.ecmwf-pet-k8s.compute.cci1.ecmwf.int
+      http:
+        paths:
+          - path: /{{ .Values.siteName }}(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $svcName }}
+                port:
+                  number: 80
+{{- end }}

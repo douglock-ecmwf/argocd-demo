@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nginx-static-site.fullname" . }}
+  labels:
+    {{- include "nginx-static-site.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "nginx-static-site.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "nginx-static-site.selectorLabels" . | nindent 8 }}
+    spec:
+      initContainers:
+        - name: init-html
+          image: busybox:stable
+          command: ['sh', '-c']
+          args:
+            - |
+              echo "$SITE_CONTENT" > /usr/share/nginx/html/index.html
+          env:
+            - name: SITE_CONTENT
+              value: {{ .Values.siteContent | quote }}
+          volumeMounts:
+            - name: content
+              mountPath: /usr/share/nginx/html
+      containers:
+        - name: nginx
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: content
+              mountPath: /usr/share/nginx/html
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: content
+          emptyDir: {}
