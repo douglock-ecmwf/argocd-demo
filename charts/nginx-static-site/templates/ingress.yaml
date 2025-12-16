@@ -25,7 +25,7 @@ spec:
     - host: demo.ecmwf-pet-k8s.compute.cci1.ecmwf.int
       http:
         paths:
-          - path: /{{ .Values.siteName }}(/|$)(.*)
+          - path: /{{ .Values.siteName }}
             pathType: Prefix
             backend:
               service:
