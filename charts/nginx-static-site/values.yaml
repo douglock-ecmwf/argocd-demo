@@ -4,7 +4,7 @@ enable_external_dns: false
 
 # Mandatory site name (used in service name, ingress path, labels)
 siteName: ""
-siteContent: "Hello, World!"
+siteContent: "Hello, World!!"
 
 image:
   repository: nginx
